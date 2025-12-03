@@ -17,113 +17,106 @@ export const ResultsPage = () => {
   // Instancia del controlador de confeti
   const [confettiInstance, setConfettiInstance] = useState(null);
 
-  // Cargar datos
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [eventoData, resultadosData] = await Promise.all([
-        eventoService.obtenerEvento(id),
-        eventoService.obtenerResultados(id)
-      ]);
-      setEvento(eventoData);
-      setResultados(resultadosData);
-    } catch (error) {
-      console.error('Error cargando resultados:', error);
-      toast.error('No se pudieron cargar los resultados');
-      navigate('/admin');
-    } finally {
-      setLoading(false);
-    }
-  }, [id, navigate]);
+  const getInstance = useCallback((instance) => {
+    setConfettiInstance(instance);
+  }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Confetti para el ganador
-  const makeConfetti = useCallback(() => {
+  // Función para disparar confeti
+  const fireConfetti = useCallback(() => {
     if (confettiInstance) {
       confettiInstance({
-        particleCount: 150,
         spread: 70,
+        startVelocity: 55,
+        particleCount: 150,
         origin: { y: 0.6 }
       });
     }
   }, [confettiInstance]);
 
   useEffect(() => {
-    if (resultados.length > 0 && confettiInstance) {
-      const timer = setTimeout(makeConfetti, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [resultados, confettiInstance, makeConfetti]);
+    const loadResults = async () => {
+      try {
+        setLoading(true);
+        const data = await eventoService.obtenerResultados(id);
+        setResults(data);
+        
+        // Si hay resultados y ganador, disparar confeti al cargar
+        if (data.length > 0) {
+          setTimeout(fireConfetti, 500);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error('Error al cargar resultados');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadResults();
+  }, [id, fireConfetti]);
 
-  // Exportar CSV
-  const handleExportCSV = async () => {
+  // Manejo de Descargas
+  const handleDownload = async (type) => {
     try {
-      const blob = await eventoService.exportarCSV(id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resultados_${evento?.nombre || id}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      toast.success('CSV descargado exitosamente');
+      toast.loading(`Generando ${type}...`);
+      const blob = type === 'PDF' 
+        ? await eventoService.exportarPDF(id)
+        : await eventoService.exportarCSV(id);
+      
+      // Crear URL temporal y forzar descarga
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `resultados_evento_${id}.${type.toLowerCase()}`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      
+      toast.dismiss();
+      toast.success(`${type} descargado exitosamente`);
     } catch (error) {
-      toast.error('Error al exportar CSV');
-      console.error(error);
+      toast.dismiss();
+      toast.error(`Error al exportar ${type}`);
     }
   };
 
-  // Exportar PDF
-  const handleExportPDF = async () => {
-    try {
-      const blob = await eventoService.exportarPDF(id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resultados_${evento?.nombre || id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      toast.success('PDF descargado exitosamente');
-    } catch (error) {
-      toast.error('Error al exportar PDF');
-      console.error(error);
-    }
+  // Asignar colores/medallas según posición
+  const getPositionStyle = (index) => {
+    if (index === 0) return { 
+      color: 'text-yellow-400', 
+      bg: 'bg-gradient-to-r from-yellow-400 to-yellow-600',
+      shadow: 'shadow-yellow-500/50',
+      icon: <Crown className="w-8 h-8 text-yellow-200 animate-bounce" />
+    };
+    if (index === 1) return { 
+      color: 'text-slate-300', 
+      bg: 'bg-gradient-to-r from-slate-300 to-slate-500',
+      shadow: 'shadow-slate-400/50',
+      icon: <Medal className="w-6 h-6 text-slate-200" />
+    };
+    if (index === 2) return { 
+      color: 'text-amber-600', 
+      bg: 'bg-gradient-to-r from-amber-600 to-amber-800',
+      shadow: 'shadow-amber-600/50',
+      icon: <Medal className="w-6 h-6 text-amber-200" />
+    };
+    return { 
+      color: 'text-cyan-400', 
+      bg: 'bg-slate-700',
+      shadow: 'shadow-none',
+      icon: <span className="text-slate-500 font-bold text-lg">#{index + 1}</span>
+    };
   };
 
-  // Calcular estadísticas
-  const totalVotos = resultados.reduce((sum, r) => sum + r.totalVotos, 0);
-  const ganador = resultados[0];
+  if (loading) return <div className="text-center py-20 text-slate-500">Calculando resultados...</div>;
 
-  // Colores para las barras
-  const barColors = [
-    'from-yellow-400 to-yellow-600', // Oro para el 1ro
-    'from-slate-300 to-slate-500',   // Plata para el 2do
-    'from-amber-600 to-amber-800',   // Bronce para el 3ro
-    'from-cyan-500 to-cyan-700',     // Cyan para el resto
-    'from-violet-500 to-violet-700',
-    'from-pink-500 to-pink-700',
-    'from-blue-500 to-blue-700',
-    'from-green-500 to-green-700'
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
+  const winner = results[0];
+  const totalVotosEmitidos = results.reduce((acc, curr) => acc + curr.totalVotos, 0);
 
   return (
-    <div className="min-h-screen p-6 lg:p-8">
+    <div className="space-y-8 animate-fade-in-up relative">
+      {/* Componente de Confeti (Invisible hasta activarse) */}
       <ReactCanvasConfetti
-        refConfetti={setConfettiInstance}
+        refConfetti={getInstance}
         style={{
           position: 'fixed',
           pointerEvents: 'none',
@@ -131,230 +124,125 @@ export const ResultsPage = () => {
           height: '100%',
           top: 0,
           left: 0,
-          zIndex: 50
+          zIndex: 100
         }}
       />
 
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <Button
-          variant="outline"
-          onClick={() => navigate(`/admin/eventos/${id}`)}
-          className="mb-4"
+      {/* Header con acciones */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <button 
+          onClick={() => navigate('/admin')}
+          className="flex items-center text-slate-400 hover:text-white transition-colors gap-2"
         >
-          <ArrowLeft size={18} />
-          Volver al Evento
-        </Button>
-
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-panel-dark p-6 rounded-2xl"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl lg:text-4xl font-display font-bold text-white flex items-center gap-3">
-                <Trophy className="text-yellow-400" size={36} />
-                Resultados Oficiales
-              </h1>
-              <p className="text-slate-300 mt-2 text-lg">{evento?.nombre}</p>
-            </div>
-
-            {/* Botones de Exportación */}
-            <div className="flex gap-3">
-              <Button
-                onClick={handleExportCSV}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <FileText size={18} />
-                CSV
-              </Button>
-              <Button
-                onClick={handleExportPDF}
-                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600"
-              >
-                <Download size={18} />
-                PDF
-              </Button>
-            </div>
-          </div>
-        </motion.div>
+          <ArrowLeft size={20} /> Volver al Panel
+        </button>
+        
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => handleDownload('CSV')}>
+            <FileText size={18} /> CSV
+          </Button>
+          <Button onClick={() => handleDownload('PDF')}>
+            <Download size={18} /> Exportar PDF
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="glass-panel-dark p-6 rounded-2xl"
+      {/* --- PODIO DEL GANADOR --- */}
+      {winner && (
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="glass-panel-dark p-8 rounded-3xl text-center relative overflow-hidden border border-yellow-500/30"
         >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-cyan-500/20 rounded-xl">
-              <Users className="text-cyan-400" size={28} />
+          {/* Fondo resplandeciente */}
+          <div className="absolute top-[-50%] left-[-20%] w-[150%] h-[200%] bg-gradient-to-b from-yellow-500/10 via-transparent to-transparent animate-pulse-slow pointer-events-none" />
+          
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="mb-4 relative">
+              <Crown size={64} className="text-yellow-400 drop-shadow-lg" />
+              <div className="absolute inset-0 bg-yellow-400 blur-2xl opacity-20 animate-pulse" />
             </div>
-            <div>
-              <p className="text-slate-400 text-sm uppercase tracking-wider">Total Votos</p>
-              <p className="text-3xl font-bold text-white">{totalVotos}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="glass-panel-dark p-6 rounded-2xl"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-violet-500/20 rounded-xl">
-              <BarChart3 className="text-violet-400" size={28} />
-            </div>
-            <div>
-              <p className="text-slate-400 text-sm uppercase tracking-wider">Candidatos</p>
-              <p className="text-3xl font-bold text-white">{resultados.length}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="glass-panel-dark p-6 rounded-2xl"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-yellow-500/20 rounded-xl">
-              <TrendingUp className="text-yellow-400" size={28} />
-            </div>
-            <div>
-              <p className="text-slate-400 text-sm uppercase tracking-wider">Participación</p>
-              <p className="text-3xl font-bold text-white">{totalVotos > 0 ? '100%' : '0%'}</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Podio del Ganador */}
-      {ganador && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="max-w-7xl mx-auto mb-8"
-        >
-          <div className="glass-panel-dark p-8 rounded-2xl border-2 border-yellow-500/50 relative overflow-hidden">
-            {/* Brillo de fondo */}
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-transparent to-yellow-500/10 animate-pulse"></div>
             
-            <div className="relative flex flex-col md:flex-row items-center justify-center gap-6">
-              <div className="p-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full">
-                <Trophy size={48} className="text-white" />
+            <h2 className="text-slate-400 uppercase tracking-widest text-sm font-bold mb-2">Ganador Electo</h2>
+            <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-2">
+              {winner.nombreCandidato}
+            </h1>
+            <p className="text-xl text-yellow-400 font-medium mb-6">
+              {winner.partido}
+            </p>
+
+            <div className="flex gap-8 text-center">
+              <div>
+                <p className="text-3xl font-bold text-white">{winner.totalVotos}</p>
+                <p className="text-xs text-slate-500 uppercase">Votos</p>
               </div>
-              
-              <div className="text-center md:text-left">
-                <p className="text-yellow-400 text-sm uppercase tracking-widest font-semibold mb-1">
-                  🏆 Ganador 🏆
-                </p>
-                <h2 className="text-4xl font-display font-bold text-white mb-2">
-                  {ganador.nombreCandidato}
-                </h2>
-                {ganador.partido && (
-                  <p className="text-slate-300 text-lg mb-3">
-                    Partido: <span className="font-semibold text-cyan-400">{ganador.partido}</span>
-                  </p>
-                )}
-                <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                  <div className="bg-white/10 px-6 py-3 rounded-xl backdrop-blur-sm">
-                    <p className="text-3xl font-bold text-white">{ganador.totalVotos}</p>
-                    <p className="text-slate-300 text-sm">votos</p>
-                  </div>
-                  <div className="bg-white/10 px-6 py-3 rounded-xl backdrop-blur-sm">
-                    <p className="text-3xl font-bold text-yellow-400">{ganador.porcentaje.toFixed(2)}%</p>
-                    <p className="text-slate-300 text-sm">del total</p>
-                  </div>
-                </div>
+              <div className="w-px bg-white/10" />
+              <div>
+                <p className="text-3xl font-bold text-white">{winner.porcentaje}%</p>
+                <p className="text-xs text-slate-500 uppercase">Preferencia</p>
               </div>
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Gráfico de Barras con Todos los Resultados */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="max-w-7xl mx-auto"
-      >
-        <div className="glass-panel-dark p-6 lg:p-8 rounded-2xl">
-          <h3 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-3">
-            <BarChart3 className="text-cyan-400" size={28} />
-            Distribución de Votos
-          </h3>
+      {/* --- TABLA GRÁFICA DE RESULTADOS --- */}
+      <div className="glass-panel-dark p-8 rounded-3xl">
+        <h3 className="font-display text-xl font-bold mb-6 flex items-center gap-2">
+          <Trophy size={20} className="text-cyan-400" /> Tabla de Posiciones
+        </h3>
 
-          <div className="space-y-6">
-            {resultados.map((resultado, index) => {
-              const maxVotos = resultados[0]?.totalVotos || 1;
-              const percentage = (resultado.totalVotos / maxVotos) * 100;
-              const colorClass = barColors[index] || barColors[barColors.length - 1];
-
-              return (
-                <motion.div
-                  key={resultado.candidatoId}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="space-y-2"
-                >
-                  {/* Nombre y Stats */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-slate-400">#{index + 1}</span>
-                      <div>
-                        <p className="text-white font-semibold text-lg">
-                          {resultado.nombreCandidato}
-                        </p>
-                        {resultado.partido && (
-                          <p className="text-slate-400 text-sm">{resultado.partido}</p>
-                        )}
-                      </div>
+        <div className="space-y-6">
+          {results.map((candidato, index) => {
+            const style = getPositionStyle(index);
+            return (
+              <motion.div 
+                key={candidato.candidatoId}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative"
+              >
+                {/* Info Candidato */}
+                <div className="flex justify-between items-end mb-2 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8">
+                        {style.icon}
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-white">{resultado.totalVotos}</p>
-                      <p className="text-cyan-400 text-sm font-semibold">
-                        {resultado.porcentaje.toFixed(2)}%
-                      </p>
+                    <div>
+                      <h4 className={`font-bold text-lg ${index === 0 ? 'text-white' : 'text-slate-200'}`}>
+                        {candidato.nombreCandidato}
+                      </h4>
+                      <p className="text-xs text-slate-500">{candidato.partido}</p>
                     </div>
                   </div>
-
-                  {/* Barra de Progreso */}
-                  <div className="relative h-8 bg-slate-800/50 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 1, delay: 0.6 + index * 0.1 }}
-                      className={`h-full bg-gradient-to-r ${colorClass} rounded-full shadow-lg`}
-                    >
-                      <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                    </motion.div>
+                  <div className="text-right">
+                    <span className="font-bold text-white">{candidato.porcentaje}%</span>
+                    <span className="text-xs text-slate-500 ml-2">({candidato.totalVotos} votos)</span>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                </div>
 
-          {/* Mensaje si no hay votos */}
-          {totalVotos === 0 && (
-            <div className="text-center py-12">
-              <p className="text-slate-400 text-lg">
-                Aún no se han registrado votos en este evento.
-              </p>
-            </div>
-          )}
+                {/* Barra de Progreso */}
+                <div className="h-4 bg-slate-800 rounded-full overflow-hidden relative">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${candidato.porcentaje}%` }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                    className={`h-full rounded-full ${style.bg} ${style.shadow} shadow-lg relative`}
+                  >
+                    {/* Efecto de brillo en la barra */}
+                    <div className="absolute top-0 right-0 bottom-0 w-1 bg-white/50" />
+                  </motion.div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-      </motion.div>
+
+        <div className="mt-8 pt-6 border-t border-white/5 text-right text-slate-500 text-sm">
+          Total de votos contabilizados: <span className="text-white font-bold">{totalVotosEmitidos}</span>
+        </div>
+      </div>
     </div>
   );
 };
