@@ -5,6 +5,8 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { EventosPage } from './pages/admin/EventosPage';
+import { CandidatosPage } from './pages/admin/CandidatosPage';
 import { EventDetailsPage } from './pages/admin/EventDetailsPage';
 import { ResultsPage } from './pages/admin/ResultsPage';
 import { VoterLayout } from './layouts/VoterLayout';
@@ -39,9 +41,10 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['ADMINISTRADOR']} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/eventos" element={<EventosPage />} />
               <Route path="/admin/eventos/:id" element={<EventDetailsPage />} />
               <Route path="/admin/eventos/:id/resultados" element={<ResultsPage />} />
-              {/* Aquí agregaremos más rutas: /admin/candidatos */}
+              <Route path="/admin/candidatos" element={<CandidatosPage />} />
             </Route>
           </Route>
 

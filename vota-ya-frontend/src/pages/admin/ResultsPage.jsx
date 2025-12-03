@@ -1,18 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, Download, FileText, BarChart3, Users, TrendingUp, ArrowLeft } from 'lucide-react';
-import { eventoService } from '../../services/eventoService';
-import { Button } from '../../components/Button';
 import ReactCanvasConfetti from 'react-canvas-confetti';
+import { ArrowLeft, Trophy, Download, FileText, Crown, Medal } from 'lucide-react';
+import { eventoService } from '../../services/eventoService';
+import { Button } from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 
 export const ResultsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [evento, setEvento] = useState(null);
-  const [resultados, setResultados] = useState([]);
+  
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Instancia del controlador de confeti
   const [confettiInstance, setConfettiInstance] = useState(null);
 
   // Cargar datos

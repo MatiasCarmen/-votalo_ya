@@ -50,17 +50,21 @@ export const AdminDashboard = () => {
       setLoading(true);
       // 1. Obtener eventos activos
       const activeEventsData = await eventoService.listarActivos();
-      setEvents(activeEventsData);
+      
+      // Validar que sea un array
+      const eventsArray = Array.isArray(activeEventsData) ? activeEventsData : [];
+      setEvents(eventsArray);
       
       // 2. Actualizar contadores
       setStats(prev => ({
         ...prev,
-        activeEvents: activeEventsData.length
+        activeEvents: eventsArray.length
       }));
 
     } catch (error) {
       console.error("Error cargando dashboard:", error);
       toast.error('No se pudo actualizar el panel');
+      setEvents([]); // Asegurar que siempre sea un array
     } finally {
       setLoading(false);
     }

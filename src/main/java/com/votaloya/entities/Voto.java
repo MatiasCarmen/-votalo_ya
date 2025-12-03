@@ -1,17 +1,19 @@
 package com.votaloya.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "votos", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"votante_id", "evento_id"})
+        @UniqueConstraint(columnNames = { "votante_id", "evento_id" })
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "votante", "candidato", "evento" })
 public class Voto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
