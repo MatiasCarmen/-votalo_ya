@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Calendar, Users, TrendingUp, Activity, Vote } from 'lucide-react';
+import { CreateEventModal } from '../../components/admin/CreateEventModal';
 
 const StatCard = ({ title, value, label, icon: IconComponent, color, delay }) => (
   <div 
@@ -27,6 +29,8 @@ const StatCard = ({ title, value, label, icon: IconComponent, color, delay }) =>
 );
 
 export const AdminDashboard = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <div className="space-y-8">
       {/* Stats Grid */}
@@ -112,11 +116,24 @@ export const AdminDashboard = () => {
           </div>
           <h3 className="font-display text-xl font-bold mb-2">Crear Nuevo Evento</h3>
           <p className="text-slate-400 text-sm mb-6">Configura una nueva votación en minutos.</p>
-          <button className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-primary-600 to-cyan-600 hover:from-primary-500 hover:to-cyan-500 text-white font-bold shadow-lg shadow-primary-900/20 transition-all">
+          <button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-primary-600 to-cyan-600 hover:from-primary-500 hover:to-cyan-500 text-white font-bold shadow-lg shadow-primary-900/20 transition-all"
+          >
             Comenzar
           </button>
         </div>
       </div>
+
+      {/* MODAL DE CREACIÓN */}
+      <CreateEventModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)}
+        onEventCreated={() => {
+           // Aquí recargaremos los datos más tarde
+           console.log("Evento creado, recargar lista...");
+        }} 
+      />
     </div>
   );
 };
