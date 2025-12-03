@@ -6,10 +6,8 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { EventDetailsPage } from './pages/admin/EventDetailsPage';
-
-// --- PLACEHOLDER TEMPORAL para Votante ---
-const VoterHome = () => <div className="p-10 text-2xl font-bold text-accent-600">🗳️ Vista de Votación (Próximamente)</div>;
-// -------------------------------------------------------------------
+import { VoterLayout } from './layouts/VoterLayout';
+import { VoterDashboard } from './pages/voter/VoterDashboard';
 
 function App() {
   return (
@@ -46,7 +44,10 @@ function App() {
 
           {/* 🛡️ Rutas Protegidas de VOTANTE */}
           <Route element={<ProtectedRoute allowedRoles={['VOTANTE']} />}>
-            <Route path="/votar" element={<VoterHome />} />
+            <Route element={<VoterLayout />}>
+              <Route path="/votar" element={<VoterDashboard />} />
+              {/* <Route path="/votar/evento/:id" element={<VotingRoom />} /> */}
+            </Route>
           </Route>
         </Routes>
       </AuthProvider>
