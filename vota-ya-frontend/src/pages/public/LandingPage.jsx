@@ -17,8 +17,18 @@ export const LandingPage = () => {
       
       {/* Navbar Simple */}
       <nav className="relative z-20 p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <div className="font-display font-bold text-2xl tracking-wide">
-          Votalo<span className="text-cyan-400">Ya</span>
+        <div className="font-display font-bold text-2xl tracking-wide flex items-center gap-3">
+          <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="url(#gradient)" />
+            <path d="M16 8L12 20H15L13 24L20 14H17L19 8H16Z" fill="white" />
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stopColor="#22d3ee" />
+                <stop offset="100%" stopColor="#0ea5e9" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>Votalo<span className="text-cyan-400">Ya</span></span>
         </div>
         <div className="flex gap-4">
           <button onClick={() => navigate('/login')} className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
@@ -33,7 +43,7 @@ export const LandingPage = () => {
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 relative z-10 mt-[-80px]">
         {/* Orbe de fondo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-600/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -46,7 +56,7 @@ export const LandingPage = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            Sistema de Votación 2024
+            Sistema de Votación 2025
           </div>
 
           <h1 className="font-display text-5xl md:text-7xl font-bold leading-tight">
@@ -99,8 +109,8 @@ export const LandingPage = () => {
 
       {/* Footer con firma */}
       <footer className="relative z-20 py-6 border-t border-white/5 text-center text-slate-500 text-sm">
-        <p>VotaloYa © 2024 - Democracia Digital Segura y Transparente</p>
-        <p className="mt-1">Desarrollado con ❤️ por <span className="text-cyan-400 font-semibold">Matias Carmen</span> - Ingeniero de Sistemas</p>
+        <p>VotaloYa © 2025 - Democracia Digital Segura y Transparente</p>
+        <p className="mt-1">Desarrollado por <span className="text-cyan-400 font-semibold">Matias Carmen</span> - Ingeniero de Sistemas</p>
       </footer>
     </div>
   );

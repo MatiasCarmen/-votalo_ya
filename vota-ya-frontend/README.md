@@ -1,4 +1,4 @@
-# 🗳️ VotaloYa - Sistema de Votación Digital
+# VotaloYa - Sistema de Votación Digital
 
 **Desarrollado por: Matias Carmen**  
 **Ingeniero de Sistemas - CICLO 8**  
@@ -6,13 +6,13 @@
 
 ---
 
-## 📋 Descripción
+## Descripción
 
 Sistema moderno de votación digital con React + Vite que permite gestionar elecciones de manera segura y transparente. Implementa autenticación JWT, gestión de roles y resultados en tiempo real con diseño "Dark Aurora".
 
 ---
 
-## 🚀 Tecnologías
+## Tecnologías
 
 - **React 18** + **Vite** - Desarrollo ultrarrápido
 - **React Router v6** - Enrutamiento SPA
@@ -25,7 +25,7 @@ Sistema moderno de votación digital con React + Vite que permite gestionar elec
 
 ---
 
-## 📦 Instalación
+## Instalación
 
 ```bash
 # Instalar dependencias
@@ -40,24 +40,24 @@ npm run build
 
 ---
 
-## 🎨 Características
+## Características
 
-✅ Landing Page épica con hero section  
-✅ Autenticación JWT segura  
-✅ Panel de administrador completo  
-✅ Gestión de eventos y candidatos  
-✅ Sala de votación intuitiva  
-✅ Resultados con podio olímpico y confeti 🎉  
-✅ Exportación PDF/CSV  
-✅ Diseño responsive "Dark Aurora"
+- Landing Page épica con hero section
+- Autenticación JWT segura
+- Panel de administrador completo
+- Gestión de eventos y candidatos
+- Sala de votación intuitiva
+- Resultados con podio olímpico y confeti
+- Exportación PDF/CSV
+- Diseño responsive "Dark Aurora"
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 **Matias Carmen** - Ingeniero de Sistemas  
-📧 GitHub: [@MatiasCarmen](https://github.com/MatiasCarmen)
+GitHub: [@MatiasCarmen](https://github.com/MatiasCarmen)
 
 ---
 
-_Desarrollado con ❤️ usando React + Vite_
+Desarrollado usando React + Vite

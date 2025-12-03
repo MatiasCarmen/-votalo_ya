@@ -149,4 +149,4 @@ _Ingeniero de Sistemas - CICLO 8_
 
 ---
 
-_Última actualización: 3 de diciembre de 2024_
+_Última actualización: 3 de diciembre de 2025_

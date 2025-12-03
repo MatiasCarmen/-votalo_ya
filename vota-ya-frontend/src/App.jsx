@@ -34,9 +34,10 @@ function App() {
           toastOptions={{
             className: 'glass-panel',
             style: {
-              background: 'rgba(255, 255, 255, 0.8)',
+              background: 'rgba(30, 41, 59, 0.9)', // Fondo oscuro para los toasts
               backdropFilter: 'blur(10px)',
-              color: '#1e293b',
+              color: '#fff',
+              border: '1px solid rgba(255,255,255,0.1)'
             },
           }}
         />
