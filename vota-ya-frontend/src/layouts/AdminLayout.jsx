@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Layout de Administrador
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Sidebar y navegación para panel admin
+ */
+
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 

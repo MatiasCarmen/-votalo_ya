@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Componente Input
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Input reutilizable con iconos y validación
+ */
+
 import React from 'react';
 import { cn } from '../../utils/cn';
 

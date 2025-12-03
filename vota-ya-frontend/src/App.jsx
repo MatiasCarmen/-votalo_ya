@@ -1,7 +1,18 @@
+/**
+ * VotaloYa - Sistema de Votación Digital
+ * Desarrollado por: Matias Carmen
+ * Ingeniero de Sistemas - CICLO 8
+ * @author Matias Carmen
+ * @description Router principal de la aplicación
+ */
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { LoginPage } from './pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
+import { LandingPage } from './pages/public/LandingPage';
+import { NotFoundPage } from './pages/public/NotFoundPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -31,11 +42,12 @@ function App() {
         />
         
         <Routes>
-          {/* Ruta Pública */}
-          <Route path="/login" element={<LoginPage />} />
+          {/* 🏠 Ruta Raíz - Landing Page */}
+          <Route path="/" element={<LandingPage />} />
           
-          {/* Redirección por defecto */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* 🔓 Rutas Públicas de Autenticación */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
 
           {/* 🛡️ Rutas Protegidas de ADMINISTRADOR con Layout */}
           <Route element={<ProtectedRoute allowedRoles={['ADMINISTRADOR']} />}>
@@ -55,6 +67,9 @@ function App() {
               <Route path="/votar/evento/:id" element={<VotingRoom />} />
             </Route>
           </Route>
+
+          {/* 🚫 Página 404 - Catch All */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

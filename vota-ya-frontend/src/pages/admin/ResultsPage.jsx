@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Resultados de Votación
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Podio olímpico con confeti y exportación PDF/CSV
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

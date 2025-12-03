@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Sala de Votación
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Interfaz para emitir votos en eventos activos
+ */
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

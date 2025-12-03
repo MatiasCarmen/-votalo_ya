@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Página de Login
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Autenticación de usuarios con JWT
+ */
+
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';

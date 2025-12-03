@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Ruta Protegida
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description HOC para protección de rutas por rol
+ */
+
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 

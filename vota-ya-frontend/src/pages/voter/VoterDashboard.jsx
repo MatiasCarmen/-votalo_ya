@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Dashboard de Votante
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Panel principal para usuarios votantes
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

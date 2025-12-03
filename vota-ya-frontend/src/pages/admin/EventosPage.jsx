@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Gestión de Eventos
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Lista completa de eventos del sistema
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

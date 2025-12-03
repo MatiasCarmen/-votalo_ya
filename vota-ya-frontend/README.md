@@ -1,16 +1,63 @@
-# React + Vite
+# 🗳️ VotaloYa - Sistema de Votación Digital
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Desarrollado por: Matias Carmen**  
+**Ingeniero de Sistemas - CICLO 8**  
+**Herramientas de Desarrollo**
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📋 Descripción
 
-## React Compiler
+Sistema moderno de votación digital con React + Vite que permite gestionar elecciones de manera segura y transparente. Implementa autenticación JWT, gestión de roles y resultados en tiempo real con diseño "Dark Aurora".
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🚀 Tecnologías
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React 18** + **Vite** - Desarrollo ultrarrápido
+- **React Router v6** - Enrutamiento SPA
+- **Framer Motion** - Animaciones fluidas
+- **Tailwind CSS** - Estilos modernos
+- **React Hot Toast** - Notificaciones
+- **React Canvas Confetti** - Efectos de celebración
+- **Lucide React** - Iconografía
+- **Axios** - Cliente HTTP
+
+---
+
+## 📦 Instalación
+
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
+npm run dev
+
+# Build para producción
+npm run build
+```
+
+---
+
+## 🎨 Características
+
+✅ Landing Page épica con hero section  
+✅ Autenticación JWT segura  
+✅ Panel de administrador completo  
+✅ Gestión de eventos y candidatos  
+✅ Sala de votación intuitiva  
+✅ Resultados con podio olímpico y confeti 🎉  
+✅ Exportación PDF/CSV  
+✅ Diseño responsive "Dark Aurora"
+
+---
+
+## 👨‍💻 Autor
+
+**Matias Carmen** - Ingeniero de Sistemas  
+📧 GitHub: [@MatiasCarmen](https://github.com/MatiasCarmen)
+
+---
+
+_Desarrollado con ❤️ usando React + Vite_

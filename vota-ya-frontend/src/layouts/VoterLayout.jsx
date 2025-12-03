@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Layout de Votante
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Layout principal para usuarios votantes
+ */
+
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, User } from 'lucide-react';

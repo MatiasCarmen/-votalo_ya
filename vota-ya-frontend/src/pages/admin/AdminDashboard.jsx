@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Panel de Administrador
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Dashboard principal con estadísticas y eventos
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Detalles de Evento
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Vista detallada de evento con gestión de candidatos
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

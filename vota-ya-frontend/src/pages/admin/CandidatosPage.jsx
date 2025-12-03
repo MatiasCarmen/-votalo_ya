@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Gestión de Candidatos
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Vista master-detail de candidatos por evento
+ */
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar } from 'lucide-react';

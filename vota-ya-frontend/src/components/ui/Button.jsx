@@ -1,3 +1,9 @@
+/**
+ * VotaloYa - Componente Button
+ * @author Matias Carmen - Ingeniero de Sistemas
+ * @description Botón reutilizable con variantes y estados
+ */
+
 import React from 'react';
 import { motion } from 'framer-motion';
 
