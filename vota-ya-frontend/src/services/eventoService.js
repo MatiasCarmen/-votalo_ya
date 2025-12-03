@@ -23,5 +23,27 @@ export const eventoService = {
   obtenerResultados: async (id) => {
     const response = await api.get(`/api/admin/eventos/${id}/resultados`);
     return response.data;
+  },
+
+  // Exportar resultados a CSV
+  exportarCSV: async (id) => {
+    const response = await api.get(`/api/admin/eventos/${id}/resultados/csv`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // Exportar resultados a PDF
+  exportarPDF: async (id) => {
+    const response = await api.get(`/api/admin/eventos/${id}/resultados/pdf`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // Obtener evento por ID
+  obtenerEvento: async (id) => {
+    const response = await api.get(`/api/admin/eventos/${id}`);
+    return response.data;
   }
 };

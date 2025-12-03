@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { EventDetailsPage } from './pages/admin/EventDetailsPage';
+import { ResultsPage } from './pages/admin/ResultsPage';
 import { VoterLayout } from './layouts/VoterLayout';
 import { VoterDashboard } from './pages/voter/VoterDashboard';
 import { VotingRoom } from './pages/voter/VotingRoom';
@@ -39,6 +40,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/eventos/:id" element={<EventDetailsPage />} />
+              <Route path="/admin/eventos/:id/resultados" element={<ResultsPage />} />
               {/* Aquí agregaremos más rutas: /admin/candidatos */}
             </Route>
           </Route>
