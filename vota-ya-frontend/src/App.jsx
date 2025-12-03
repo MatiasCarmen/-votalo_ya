@@ -8,6 +8,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { EventDetailsPage } from './pages/admin/EventDetailsPage';
 import { VoterLayout } from './layouts/VoterLayout';
 import { VoterDashboard } from './pages/voter/VoterDashboard';
+import { VotingRoom } from './pages/voter/VotingRoom';
 
 function App() {
   return (
@@ -46,7 +47,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['VOTANTE']} />}>
             <Route element={<VoterLayout />}>
               <Route path="/votar" element={<VoterDashboard />} />
-              {/* <Route path="/votar/evento/:id" element={<VotingRoom />} /> */}
+              <Route path="/votar/evento/:id" element={<VotingRoom />} />
             </Route>
           </Route>
         </Routes>
