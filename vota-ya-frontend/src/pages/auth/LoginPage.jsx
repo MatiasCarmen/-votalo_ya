@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { User, Lock, ArrowRight, Fingerprint, Sparkles } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -24,8 +23,8 @@ export const LoginPage = () => {
 
     const success = await login(formData.dni, formData.contrasena);
     if (success) {
-        const role = localStorage.getItem('userRole');
-        navigate(role === 'ADMINISTRADOR' ? '/admin' : '/votar');
+        const userData = JSON.parse(localStorage.getItem('user'));
+        navigate(userData.rol === 'ADMINISTRADOR' ? '/admin' : '/votar');
     }
     setIsLoading(false);
   };
@@ -44,12 +43,7 @@ export const LoginPage = () => {
       </div>
 
       {/* --- CONTENEDOR PRINCIPAL --- */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, type: "spring" }}
-        className="relative z-10 w-full max-w-5xl h-auto md:h-[600px] grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden shadow-2xl shadow-black/80 border border-white/10 glass-panel-dark mx-4"
-      >
+      <div className="relative z-10 w-full max-w-5xl h-auto md:h-[600px] grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden shadow-2xl shadow-black/80 border border-white/10 glass-panel-dark mx-4">
         
         {/* --- COLUMNA IZQUIERDA: VISUAL --- */}
         <div className="relative hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-primary-900/50 to-slate-900/50">
@@ -58,12 +52,7 @@ export const LoginPage = () => {
              <div className="absolute bottom-20 right-20 w-32 h-32 border border-white/5 rounded-full" />
            </div>
 
-           <motion.div 
-             initial={{ x: -20, opacity: 0 }}
-             animate={{ x: 0, opacity: 1 }}
-             transition={{ delay: 0.3 }}
-             className="z-10"
-           >
+           <div className="z-10">
              <div className="w-16 h-16 bg-gradient-to-tr from-primary-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary-500/30">
                 <Fingerprint className="text-white w-8 h-8" />
              </div>
@@ -76,7 +65,7 @@ export const LoginPage = () => {
              <p className="text-slate-300 text-base md:text-lg max-w-md leading-relaxed font-light">
                Bienvenido a la plataforma de votación más segura y moderna. Tu participación define el futuro.
              </p>
-           </motion.div>
+           </div>
         </div>
 
         {/* --- COLUMNA DERECHA: FORMULARIO --- */}
@@ -147,7 +136,7 @@ export const LoginPage = () => {
             </Link>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Footer minimalista */}
       <div className="absolute bottom-4 text-center w-full text-slate-500 text-xs font-medium">

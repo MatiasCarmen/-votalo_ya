@@ -17,14 +17,18 @@ export const AuthProvider = ({ children }) => {
 
   // Al cargar la app, verificamos si ya había sesión guardada
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const initAuth = () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (storedUser && token) {
+        setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
+      }
+      setLoading(false);
+    };
     
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
+    initAuth();
   }, []);
 
   const login = async (dni, contrasena) => {

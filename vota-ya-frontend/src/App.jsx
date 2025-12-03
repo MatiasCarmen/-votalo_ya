@@ -3,9 +3,10 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { LoginPage } from './pages/auth/LoginPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { AdminLayout } from './layouts/AdminLayout';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
 
-// --- PLACEHOLDERS TEMPORALES (Para probar que el router funciona) ---
-const AdminDashboard = () => <div className="p-10 text-2xl font-bold text-primary-700">🏆 Panel de Administrador (Próximamente)</div>;
+// --- PLACEHOLDER TEMPORAL para Votante ---
 const VoterHome = () => <div className="p-10 text-2xl font-bold text-accent-600">🗳️ Vista de Votación (Próximamente)</div>;
 // -------------------------------------------------------------------
 
@@ -33,9 +34,12 @@ function App() {
           {/* Redirección por defecto */}
           <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* 🛡️ Rutas Protegidas de ADMINISTRADOR */}
+          {/* 🛡️ Rutas Protegidas de ADMINISTRADOR con Layout */}
           <Route element={<ProtectedRoute allowedRoles={['ADMINISTRADOR']} />}>
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              {/* Aquí agregaremos más rutas: /admin/eventos, /admin/candidatos */}
+            </Route>
           </Route>
 
           {/* 🛡️ Rutas Protegidas de VOTANTE */}
