@@ -1,12 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', 
+  baseURL: 'http://localhost:8080',
+  headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// INTERCEPTOR 1: Inyectar Token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -18,12 +18,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// INTERCEPTOR 2: Manejar Expulsión (Token Vencido)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Si el backend dice "No autorizado", limpiamos todo y redirigimos
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
