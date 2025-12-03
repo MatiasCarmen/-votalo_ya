@@ -5,6 +5,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { EventDetailsPage } from './pages/admin/EventDetailsPage';
 
 // --- PLACEHOLDER TEMPORAL para Votante ---
 const VoterHome = () => <div className="p-10 text-2xl font-bold text-accent-600">🗳️ Vista de Votación (Próximamente)</div>;
@@ -38,7 +39,8 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['ADMINISTRADOR']} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
-              {/* Aquí agregaremos más rutas: /admin/eventos, /admin/candidatos */}
+              <Route path="/admin/eventos/:id" element={<EventDetailsPage />} />
+              {/* Aquí agregaremos más rutas: /admin/candidatos */}
             </Route>
           </Route>
 

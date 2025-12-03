@@ -6,7 +6,7 @@ export const Button = ({ children, isLoading, variant = 'primary', className, ..
   
   const variants = {
     primary: "bg-gradient-to-r from-primary-600 to-primary-500 hover:to-primary-400 text-white shadow-primary-500/30",
-    outline: "bg-white/40 border-2 border-primary-500 text-primary-700 hover:bg-primary-50 backdrop-blur-md",
+    outline: "bg-slate-800/50 border-2 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400 backdrop-blur-md",
   };
 
   return (

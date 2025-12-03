@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Users, TrendingUp, Activity, Vote, Clock } from 'lucide-react';
 import { eventoService } from '../../services/eventoService';
@@ -31,6 +32,7 @@ const StatCard = ({ title, value, label, icon: IconComponent, color, delay }) =>
 );
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -121,7 +123,11 @@ export const AdminDashboard = () => {
               </div>
             ) : (
               events.map((event) => (
-                <div key={event.id} className="flex items-center p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 group cursor-pointer">
+                <div 
+                  key={event.id} 
+                  onClick={() => navigate(`/admin/eventos/${event.id}`)}
+                  className="flex items-center p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 group cursor-pointer"
+                >
                   {/* Icono de Calendario con día */}
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-800 to-slate-700 flex flex-col items-center justify-center border border-white/10 group-hover:border-primary-500/30 transition-colors">
                     <span className="text-xs text-slate-400 uppercase">{new Date(event.fechaInicio).toLocaleString('es-ES', { month: 'short' })}</span>
