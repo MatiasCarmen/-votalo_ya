@@ -1,0 +1,951 @@
+================================================================================
+                 ENDPOINTS Y JSONS PARA FRONTEND
+                    Sistema de Votaciones Online
+================================================================================
+
+BASE URL: http://localhost:8080
+
+================================================================================
+1. AUTENTICACIÓN
+================================================================================
+
+1.1 REGISTRO DE USUARIO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  POST /api/auth/registro
+Auth:      No requiere
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "nombres": "Juan Carlos",
+  "apellidos": "Pérez García",
+  "dni": "12345678",
+  "contrasena": "password123",
+  "correo": "juan.perez@example.com",
+  "numeroTelefono": "987654321",
+  "rol": "VOTANTE"
+}
+
+RESPONSE (200 OK):
+{
+  "mensaje": "Usuario registrado exitosamente",
+  "dni": "12345678",
+  "correo": "juan.perez@example.com"
+}
+
+ERRORES POSIBLES:
+- 409 Conflict: "El DNI ya está registrado"
+- 409 Conflict: "El correo ya está registrado"
+- 400 Bad Request: "Error de validación en campos"
+
+────────────────────────────────────────────────────────────────────────────────
+
+1.2 INICIO DE SESIÓN (LOGIN)
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  POST /api/auth/login
+Auth:      No requiere
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "dni": "12345678",
+  "contrasena": "admin123"
+}
+
+RESPONSE (200 OK):
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OCIsInJvbCI6IkFETUlOSVNUUkFET1IiLCJpYXQiOjE3MDE2MjQwMDAsImV4cCI6MTcwMTcxMDQwMH0.abc123...",
+  "dni": "12345678",
+  "nombreCompleto": "Administrador Sistema",
+  "correo": "admin@votaloya.com",
+  "rol": "ADMINISTRADOR"
+}
+
+ERRORES POSIBLES:
+- 401 Unauthorized: "Credenciales inválidas"
+
+NOTA IMPORTANTE PARA FRONTEND:
+Guardar el token en localStorage o sessionStorage:
+localStorage.setItem('token', response.token);
+localStorage.setItem('userRole', response.rol);
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+2. GESTIÓN DE EVENTOS (ADMINISTRADOR)
+================================================================================
+
+NOTA: Todos los endpoints requieren:
+Header: Authorization: Bearer {token}
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.1 CREAR EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  POST /api/admin/eventos
+Auth:      Bearer Token (ADMINISTRADOR)
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "nombre": "Elecciones Estudiantiles 2024",
+  "descripcion": "Proceso electoral para elegir representantes estudiantiles ante el consejo universitario",
+  "fechaInicio": "2024-12-15T08:00:00",
+  "fechaFin": "2024-12-15T18:00:00"
+}
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Elecciones Estudiantiles 2024",
+  "descripcion": "Proceso electoral para elegir representantes estudiantiles ante el consejo universitario",
+  "fechaInicio": "2024-12-15T08:00:00",
+  "fechaFin": "2024-12-15T18:00:00",
+  "activo": true,
+  "fechaCreacion": "2024-12-03T10:30:00",
+  "creador": {
+    "id": 1,
+    "nombres": "Administrador",
+    "apellidos": "Sistema",
+    "dni": "12345678"
+  },
+  "candidatos": [],
+  "votos": []
+}
+
+ERRORES POSIBLES:
+- 401 Unauthorized: Token inválido
+- 403 Forbidden: "Solo los administradores pueden crear eventos"
+- 400 Bad Request: Validación de fechas
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.2 LISTAR EVENTOS ACTIVOS
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos
+Auth:      Bearer Token (ADMINISTRADOR)
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "id": 1,
+    "nombre": "Elecciones Estudiantiles 2024",
+    "descripcion": "Proceso electoral...",
+    "fechaInicio": "2024-12-15T08:00:00",
+    "fechaFin": "2024-12-15T18:00:00",
+    "activo": true,
+    "fechaCreacion": "2024-12-03T10:30:00"
+  },
+  {
+    "id": 2,
+    "nombre": "Referéndum Universitario",
+    "descripcion": "Votación sobre reforma...",
+    "fechaInicio": "2024-12-20T08:00:00",
+    "fechaFin": "2024-12-20T20:00:00",
+    "activo": true,
+    "fechaCreacion": "2024-12-05T14:00:00"
+  }
+]
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.3 LISTAR TODOS LOS EVENTOS (Incluyendo históricos)
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos/todos
+Auth:      Bearer Token (ADMINISTRADOR)
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "id": 1,
+    "nombre": "Elecciones 2024",
+    "activo": true,
+    ...
+  },
+  {
+    "id": 2,
+    "nombre": "Elecciones 2023",
+    "activo": false,
+    ...
+  }
+]
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.4 OBTENER EVENTO POR ID
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos/{id}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   GET /api/admin/eventos/1
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Elecciones Estudiantiles 2024",
+  "descripcion": "Proceso electoral...",
+  "fechaInicio": "2024-12-15T08:00:00",
+  "fechaFin": "2024-12-15T18:00:00",
+  "activo": true,
+  "candidatos": [
+    {
+      "id": 1,
+      "nombre": "Ana María Torres",
+      "partido": "Movimiento Estudiantil"
+    },
+    {
+      "id": 2,
+      "nombre": "Carlos Mendoza",
+      "partido": "Frente Universitario"
+    }
+  ]
+}
+
+ERRORES POSIBLES:
+- 404 Not Found: Evento no existe
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.5 EDITAR EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  PUT /api/admin/eventos/{id}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   PUT /api/admin/eventos/1
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "nombre": "Elecciones Estudiantiles 2024 - Actualizado",
+  "descripcion": "Proceso electoral modificado por cambio de fechas",
+  "fechaInicio": "2024-12-15T09:00:00",
+  "fechaFin": "2024-12-15T20:00:00"
+}
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Elecciones Estudiantiles 2024 - Actualizado",
+  "descripcion": "Proceso electoral modificado por cambio de fechas",
+  "fechaInicio": "2024-12-15T09:00:00",
+  "fechaFin": "2024-12-15T20:00:00",
+  "activo": true
+}
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.6 DESACTIVAR EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  PATCH /api/admin/eventos/{id}/desactivar
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   PATCH /api/admin/eventos/1/desactivar
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Elecciones Estudiantiles 2024",
+  "activo": false
+}
+
+────────────────────────────────────────────────────────────────────────────────
+
+2.7 ELIMINAR EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  DELETE /api/admin/eventos/{id}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   DELETE /api/admin/eventos/1
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+"Evento eliminado correctamente"
+
+NOTA: Esto elimina el evento y TODOS sus candidatos y votos (CASCADE DELETE)
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+3. GESTIÓN DE CANDIDATOS (ADMINISTRADOR)
+================================================================================
+
+3.1 CREAR CANDIDATO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  POST /api/admin/candidatos
+Auth:      Bearer Token (ADMINISTRADOR)
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "nombre": "Ana María Torres Gutiérrez",
+  "descripcion": "Propuesta: Mejorar infraestructura y tecnología universitaria",
+  "partido": "Movimiento Estudiantil Renovado",
+  "avatarUrl": "https://example.com/avatars/ana-torres.jpg",
+  "eventoId": 1
+}
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Ana María Torres Gutiérrez",
+  "descripcion": "Propuesta: Mejorar infraestructura y tecnología universitaria",
+  "partido": "Movimiento Estudiantil Renovado",
+  "avatarUrl": "https://example.com/avatars/ana-torres.jpg",
+  "fechaRegistro": "2024-12-03T10:35:00",
+  "evento": {
+    "id": 1,
+    "nombre": "Elecciones Estudiantiles 2024"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────────────
+
+3.2 LISTAR CANDIDATOS DE UN EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/candidatos/evento/{eventoId}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   GET /api/admin/candidatos/evento/1
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "id": 1,
+    "nombre": "Ana María Torres",
+    "descripcion": "Propuesta: Mejorar infraestructura...",
+    "partido": "Movimiento Estudiantil",
+    "avatarUrl": "https://example.com/avatars/ana-torres.jpg",
+    "fechaRegistro": "2024-12-03T10:35:00"
+  },
+  {
+    "id": 2,
+    "nombre": "Carlos Mendoza",
+    "descripcion": "Propuesta: Becas y apoyo académico",
+    "partido": "Frente Universitario",
+    "avatarUrl": "https://example.com/avatars/carlos.jpg",
+    "fechaRegistro": "2024-12-03T11:00:00"
+  },
+  {
+    "id": 3,
+    "nombre": "Laura Fernández",
+    "descripcion": "Propuesta: Actividades culturales",
+    "partido": "Alianza Estudiantil",
+    "avatarUrl": "https://example.com/avatars/laura.jpg",
+    "fechaRegistro": "2024-12-03T11:15:00"
+  }
+]
+
+────────────────────────────────────────────────────────────────────────────────
+
+3.3 EDITAR CANDIDATO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  PUT /api/admin/candidatos/{id}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   PUT /api/admin/candidatos/1
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "nombre": "Ana María Torres G. - Actualizada",
+  "descripcion": "Nueva propuesta: Infraestructura, tecnología y becas",
+  "partido": "Movimiento Estudiantil Renovado",
+  "avatarUrl": "https://example.com/avatars/ana-torres-new.jpg",
+  "eventoId": 1
+}
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Ana María Torres G. - Actualizada",
+  "descripcion": "Nueva propuesta: Infraestructura, tecnología y becas",
+  ...
+}
+
+────────────────────────────────────────────────────────────────────────────────
+
+3.4 ELIMINAR CANDIDATO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  DELETE /api/admin/candidatos/{id}
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   DELETE /api/admin/candidatos/1
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+"Candidato eliminado correctamente"
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+4. VOTACIÓN (VOTANTE)
+================================================================================
+
+4.1 EMITIR VOTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  POST /api/votar
+Auth:      Bearer Token (VOTANTE)
+────────────────────────────────────────────────────────────────────────────────
+
+REQUEST BODY:
+{
+  "candidatoId": 2
+}
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "votante": {
+    "id": 2,
+    "nombres": "Juan",
+    "apellidos": "Pérez",
+    "dni": "87654321"
+  },
+  "candidato": {
+    "id": 2,
+    "nombre": "Carlos Mendoza",
+    "partido": "Frente Universitario"
+  },
+  "evento": {
+    "id": 1,
+    "nombre": "Elecciones Estudiantiles 2024"
+  },
+  "fechaVoto": "2024-12-15T10:30:45"
+}
+
+ERRORES POSIBLES:
+- 400 Bad Request: "El proceso de votación aún no ha iniciado. Inicia el: 15/12/2024 08:00"
+- 400 Bad Request: "El proceso de votación ha finalizado. Finalizó el: 15/12/2024 18:00"
+- 400 Bad Request: "Ya has votado en este evento"
+- 403 Forbidden: "Solo los votantes pueden votar"
+- 404 Not Found: "Candidato no encontrado"
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+5. RESULTADOS (ADMINISTRADOR)
+================================================================================
+
+5.1 VER RESULTADOS
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos/{id}/resultados
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   GET /api/admin/eventos/1/resultados
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "candidatoId": 2,
+    "nombreCandidato": "Carlos Mendoza",
+    "partido": "Frente Universitario",
+    "totalVotos": 150,
+    "porcentaje": 50.0
+  },
+  {
+    "candidatoId": 3,
+    "nombreCandidato": "Laura Fernández",
+    "partido": "Alianza Estudiantil",
+    "totalVotos": 90,
+    "porcentaje": 30.0
+  },
+  {
+    "candidatoId": 1,
+    "nombreCandidato": "Ana María Torres",
+    "partido": "Movimiento Estudiantil",
+    "totalVotos": 60,
+    "porcentaje": 20.0
+  }
+]
+
+NOTA: Los resultados están ordenados de mayor a menor por totalVotos
+
+────────────────────────────────────────────────────────────────────────────────
+
+5.2 EXPORTAR RESULTADOS A CSV
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos/{id}/resultados/csv
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   GET /api/admin/eventos/1/resultados/csv
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+Content-Type: text/csv
+Content-Disposition: attachment; filename=resultados_1.csv
+
+Candidato,Partido,Total Votos,Porcentaje
+Carlos Mendoza,Frente Universitario,150,50.0%
+Laura Fernández,Alianza Estudiantil,90,30.0%
+Ana María Torres,Movimiento Estudiantil,60,20.0%
+
+NOTA PARA FRONTEND:
+El browser descargará automáticamente el archivo CSV
+
+────────────────────────────────────────────────────────────────────────────────
+
+5.3 EXPORTAR RESULTADOS A PDF
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/admin/eventos/{id}/resultados/pdf
+Auth:      Bearer Token (ADMINISTRADOR)
+Ejemplo:   GET /api/admin/eventos/1/resultados/pdf
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+Content-Type: application/pdf
+Content-Disposition: attachment; filename=resultados_1.pdf
+
+[Archivo PDF binario con formato profesional]
+
+NOTA PARA FRONTEND:
+El browser descargará automáticamente el archivo PDF
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+6. ENDPOINTS PÚBLICOS (Sin autenticación)
+================================================================================
+
+6.1 LISTAR EVENTOS ACTIVOS
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/publico/eventos/activos
+Auth:      No requiere
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "id": 1,
+    "nombre": "Elecciones Estudiantiles 2024",
+    "descripcion": "Proceso electoral...",
+    "fechaInicio": "2024-12-15T08:00:00",
+    "fechaFin": "2024-12-15T18:00:00",
+    "activo": true
+  }
+]
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.2 VER DETALLE DE EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/publico/eventos/{id}
+Auth:      No requiere
+Ejemplo:   GET /api/publico/eventos/1
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+{
+  "id": 1,
+  "nombre": "Elecciones Estudiantiles 2024",
+  "descripcion": "Proceso electoral para elegir representantes...",
+  "fechaInicio": "2024-12-15T08:00:00",
+  "fechaFin": "2024-12-15T18:00:00",
+  "activo": true
+}
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.3 VER CANDIDATOS DE UN EVENTO
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/publico/eventos/{id}/candidatos
+Auth:      No requiere
+Ejemplo:   GET /api/publico/eventos/1/candidatos
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+[
+  {
+    "id": 1,
+    "nombre": "Ana María Torres",
+    "descripcion": "Propuesta: Mejorar infraestructura...",
+    "partido": "Movimiento Estudiantil",
+    "avatarUrl": "https://example.com/avatars/ana-torres.jpg"
+  },
+  {
+    "id": 2,
+    "nombre": "Carlos Mendoza",
+    "descripcion": "Propuesta: Becas y apoyo académico",
+    "partido": "Frente Universitario",
+    "avatarUrl": "https://example.com/avatars/carlos.jpg"
+  }
+]
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.4 VER RESULTADOS PÚBLICOS (Solo después del cierre)
+────────────────────────────────────────────────────────────────────────────────
+Endpoint:  GET /api/publico/eventos/{id}/resultados
+Auth:      No requiere
+Ejemplo:   GET /api/publico/eventos/1/resultados
+────────────────────────────────────────────────────────────────────────────────
+
+RESPONSE (200 OK):
+{
+  "evento": {
+    "id": 1,
+    "nombre": "Elecciones Estudiantiles 2024",
+    "descripcion": "Proceso electoral...",
+    "fechaInicio": "2024-12-15T08:00:00",
+    "fechaFin": "2024-12-15T18:00:00"
+  },
+  "resultados": [
+    {
+      "candidatoId": 2,
+      "nombreCandidato": "Carlos Mendoza",
+      "partido": "Frente Universitario",
+      "totalVotos": 150,
+      "porcentaje": 50.0
+    },
+    {
+      "candidatoId": 3,
+      "nombreCandidato": "Laura Fernández",
+      "partido": "Alianza Estudiantil",
+      "totalVotos": 90,
+      "porcentaje": 30.0
+    },
+    {
+      "candidatoId": 1,
+      "nombreCandidato": "Ana María Torres",
+      "partido": "Movimiento Estudiantil",
+      "totalVotos": 60,
+      "porcentaje": 20.0
+    }
+  ],
+  "ganador": {
+    "candidatoId": 2,
+    "nombreCandidato": "Carlos Mendoza",
+    "partido": "Frente Universitario",
+    "totalVotos": 150,
+    "porcentaje": 50.0
+  },
+  "totalVotos": 300
+}
+
+ERRORES POSIBLES:
+- 400 Bad Request: "Los resultados estarán disponibles cuando finalice el proceso de votación"
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+7. CONFIGURACIÓN DE AXIOS PARA FRONTEND
+================================================================================
+
+7.1 CONFIGURACIÓN BÁSICA (JavaScript/React/Vue/Angular)
+────────────────────────────────────────────────────────────────────────────────
+
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Interceptor para agregar token automáticamente
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para manejar errores de autenticación
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+────────────────────────────────────────────────────────────────────────────────
+
+7.2 EJEMPLOS DE USO EN COMPONENTES
+────────────────────────────────────────────────────────────────────────────────
+
+// Login
+const login = async (dni, contrasena) => {
+  try {
+    const response = await api.post('/api/auth/login', { dni, contrasena });
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('userRole', response.data.rol);
+    return response.data;
+  } catch (error) {
+    console.error('Error en login:', error.response?.data);
+    throw error;
+  }
+};
+
+// Crear evento
+const crearEvento = async (eventoData) => {
+  try {
+    const response = await api.post('/api/admin/eventos', eventoData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear evento:', error.response?.data);
+    throw error;
+  }
+};
+
+// Votar
+const emitirVoto = async (candidatoId) => {
+  try {
+    const response = await api.post('/api/votar', { candidatoId });
+    return response.data;
+  } catch (error) {
+    console.error('Error al votar:', error.response?.data);
+    throw error;
+  }
+};
+
+// Obtener resultados públicos
+const obtenerResultados = async (eventoId) => {
+  try {
+    const response = await api.get(`/api/publico/eventos/${eventoId}/resultados`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener resultados:', error.response?.data);
+    throw error;
+  }
+};
+
+// Descargar PDF
+const descargarPDF = async (eventoId) => {
+  try {
+    const response = await api.get(`/api/admin/eventos/${eventoId}/resultados/pdf`, {
+      responseType: 'blob'
+    });
+
+    // Crear link de descarga
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `resultados_${eventoId}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error('Error al descargar PDF:', error);
+    throw error;
+  }
+};
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+8. ESTADOS HTTP Y CÓDIGOS DE ERROR
+================================================================================
+
+200 OK                  - Operación exitosa
+201 Created             - Recurso creado exitosamente
+400 Bad Request         - Error de validación o regla de negocio
+401 Unauthorized        - No autenticado o token inválido
+403 Forbidden           - No autorizado (rol insuficiente)
+404 Not Found           - Recurso no encontrado
+409 Conflict            - DNI o correo duplicado
+500 Internal Server     - Error del servidor
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+9. VALIDACIONES DE CAMPOS
+================================================================================
+
+Usuario:
+- nombres:         2-100 caracteres, obligatorio
+- apellidos:       2-100 caracteres, obligatorio
+- dni:             Exactamente 8 dígitos, único, obligatorio
+- contrasena:      Mínimo 6 caracteres, obligatorio
+- correo:          Formato email válido, único, obligatorio
+- numeroTelefono:  Exactamente 9 dígitos, obligatorio
+- rol:             "ADMINISTRADOR" o "VOTANTE", obligatorio
+
+Evento:
+- nombre:          Obligatorio
+- descripcion:     Opcional
+- fechaInicio:     Formato ISO 8601, obligatorio
+- fechaFin:        Formato ISO 8601, debe ser > fechaInicio, obligatorio
+
+Candidato:
+- nombre:          Obligatorio
+- descripcion:     Opcional
+- partido:         Opcional
+- avatarUrl:       URL válida, opcional
+- eventoId:        ID válido de evento existente, obligatorio
+
+Voto:
+- candidatoId:     ID válido de candidato existente, obligatorio
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+10. FORMATO DE FECHAS
+================================================================================
+
+TODAS LAS FECHAS USAN FORMATO ISO 8601:
+"2024-12-15T08:00:00"
+
+Formato: YYYY-MM-DDTHH:mm:ss
+
+Ejemplo en JavaScript:
+const fecha = new Date().toISOString().slice(0, 19);
+
+Ejemplo al parsear:
+const fechaInicio = new Date("2024-12-15T08:00:00");
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+11. USUARIOS DE PRUEBA POR DEFECTO
+================================================================================
+
+ADMINISTRADOR:
+DNI:       12345678
+Contraseña: admin123
+Email:     admin@votaloya.com
+
+VOTANTE 1:
+DNI:       87654321
+Contraseña: votante123
+Email:     juan.perez@example.com
+
+VOTANTE 2:
+DNI:       11223344
+Contraseña: votante123
+Email:     maria.gonzalez@example.com
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+12. HEADERS REQUERIDOS
+================================================================================
+
+Para endpoints protegidos:
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+Para todos los POST/PUT:
+Content-Type: application/json
+
+Para descargas (PDF/CSV):
+responseType: 'blob' (en la configuración de axios)
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+13. FLUJO TÍPICO PARA FRONTEND
+================================================================================
+
+FLUJO ADMINISTRADOR:
+1. Login → POST /api/auth/login
+2. Guardar token en localStorage
+3. Crear evento → POST /api/admin/eventos
+4. Crear candidatos (3+) → POST /api/admin/candidatos (repetir)
+5. Monitorear durante votación
+6. Ver resultados → GET /api/admin/eventos/{id}/resultados
+7. Exportar PDF → GET /api/admin/eventos/{id}/resultados/pdf
+
+FLUJO VOTANTE:
+1. Registro → POST /api/auth/registro (si es nuevo)
+2. Login → POST /api/auth/login
+3. Guardar token en localStorage
+4. Ver eventos activos → GET /api/publico/eventos/activos
+5. Ver candidatos → GET /api/publico/eventos/{id}/candidatos
+6. Emitir voto → POST /api/votar
+7. Ver resultados (después) → GET /api/publico/eventos/{id}/resultados
+
+FLUJO PÚBLICO:
+1. Ver eventos activos → GET /api/publico/eventos/activos
+2. Ver candidatos → GET /api/publico/eventos/{id}/candidatos
+3. Ver resultados (después del cierre) → GET /api/publico/eventos/{id}/resultados
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+14. TIPS PARA FRONTEND
+================================================================================
+
+1. Almacenar token en localStorage o sessionStorage
+2. Incluir token en TODAS las peticiones protegidas
+3. Manejar expiración de token (401) → redirigir a login
+4. Validar rol del usuario antes de mostrar opciones de admin
+5. Mostrar mensajes de error amigables al usuario
+6. Usar loading states durante peticiones asíncronas
+7. Para fechas, usar componentes date-time picker
+8. Para avatarUrl, permitir upload de imagen o URL
+9. Implementar confirmaciones antes de eliminar
+10. Cachear resultados públicos para reducir peticiones
+11. Implementar protección de rutas según rol
+12. Usar react-router-dom (React) o vue-router (Vue) para navegación
+13. Para gráficos de resultados, usar Chart.js o Recharts
+14. Implementar refresh token si es necesario
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+15. ESTRUCTURA RECOMENDADA PARA FRONTEND
+================================================================================
+
+src/
+├── api/
+│   ├── axiosConfig.js         (Configuración de axios)
+│   ├── authService.js         (Login, registro)
+│   ├── eventosService.js      (CRUD eventos)
+│   ├── candidatosService.js   (CRUD candidatos)
+│   └── votosService.js        (Emitir voto)
+├── components/
+│   ├── Login.jsx
+│   ├── Register.jsx
+│   ├── Dashboard.jsx
+│   ├── EventosList.jsx
+│   ├── EventoForm.jsx
+│   ├── CandidatosList.jsx
+│   ├── CandidatoForm.jsx
+│   ├── VotarView.jsx
+│   └── ResultadosView.jsx
+├── context/
+│   └── AuthContext.jsx        (Gestión de autenticación global)
+├── guards/
+│   ├── AdminRoute.jsx         (Protección de rutas admin)
+│   └── VotanteRoute.jsx       (Protección de rutas votante)
+├── utils/
+│   ├── dateFormatter.js
+│   └── validators.js
+└── App.jsx
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+Versión: 1.0
+Fecha: 03/12/2024
+Sistema: Votalo Ya - API REST
+Backend: http://localhost:8080
+================================================================================
+

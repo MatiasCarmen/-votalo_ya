@@ -1,0 +1,448 @@
+================================================================================
+================================================================================
+Sistema: Votalo Ya - Sistema de Votaciones Online
+Fecha: 03/12/2024
+Versión: 1.0
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+   - Error inesperado → 500 con log del error
+   - Error de BD → 500 Internal Server Error
+15.5 ERRORES DE SERVIDOR
+
+   - Recurso no encontrado → 404 Not Found
+   - DNI duplicado → 409 Conflict
+   - Votar fuera de horario → 400 Bad Request con mensaje
+15.4 ERRORES DE NEGOCIO
+
+   - Intento de votar más de una vez → 403 Forbidden
+   - Rol insuficiente → 403 Forbidden
+15.3 ERRORES DE AUTORIZACIÓN
+
+   - Credenciales incorrectas → 401 Unauthorized
+   - Token inválido/expirado → 401 Unauthorized
+15.2 ERRORES DE AUTENTICACIÓN
+
+   - Campos obligatorios faltantes → 400 Bad Request
+   - Formato de datos incorrecto → 400 Bad Request
+15.1 ERRORES DE VALIDACIÓN
+
+El sistema maneja errores en múltiples niveles:
+
+================================================================================
+15. MANEJO DE ERRORES
+================================================================================
+
+└── Spring Validation       → Validación de DTOs
+├── Jakarta Validation      → Anotaciones @Valid, @NotBlank
+Validación:
+
+└── MySQL Connector         → Driver de base de datos
+├── Apache Commons CSV 1.10 → Generación de CSVs
+├── iText PDF 5.5.13        → Generación de PDFs
+├── Lombok                  → Reducción de código boilerplate
+├── BCrypt                  → Encriptación de contraseñas
+├── JWT (jjwt 0.11.5)       → Tokens de autenticación
+├── Hibernate               → Implementación JPA
+├── Spring Data JPA          → ORM para base de datos
+├── Spring Security          → Autenticación y autorización
+├── Spring Boot 3.x          → Framework principal
+Backend:
+
+================================================================================
+14. TECNOLOGÍAS Y LIBRERÍAS UTILIZADAS
+================================================================================
+
+   - Exportación solo para administradores
+   - Administradores pueden ver en cualquier momento
+   - Resultados públicos solo después de fechaFin
+13.4 VALIDACIONES DE RESULTADOS
+
+   - Evento debe estar activo
+   - Candidato debe pertenecer al evento
+   - Usuario no debe haber votado antes en ese evento
+   - Fecha actual entre fechaInicio y fechaFin
+   - Usuario debe ser VOTANTE
+13.3 VALIDACIONES DE VOTO
+
+   - Solo administradores pueden crear/editar
+   - fechaInicio < fechaFin
+   - Nombre: obligatorio
+13.2 VALIDACIONES DE EVENTO
+
+   - Contraseña: mínimo 6 caracteres, encriptada
+   - Teléfono: 9 dígitos
+   - Correo: formato válido, único
+   - DNI: 8 dígitos, único
+13.1 VALIDACIONES DE USUARIO
+
+================================================================================
+13. VALIDACIONES Y REGLAS DE NEGOCIO
+================================================================================
+
+   5. Browser descarga el archivo
+      └── Ganador destacado
+      ├── Tabla de resultados
+      ├── Información del evento
+      ├── Logo y título
+   4. Sistema genera PDF con:
+   3. Clic en "Exportar PDF"
+   2. Selecciona evento finalizado
+   1. Admin accede a panel de administración
+
+12.4 CASO: ADMIN EXPORTA RESULTADOS
+
+   5. Frontend muestra resultados con gráficos
+   4. Sistema identifica ganador: Candidato B
+      └── Candidato C: 60 votos (20%)
+      ├── Candidato A: 90 votos (30%)
+      ├── Candidato B: 150 votos (50%)
+   3. Sistema calcula:
+   2. Público accede a /api/publico/eventos/1/resultados
+   1. Después de las 18:00 (cierre)
+
+12.3 CASO: CONSULTA DE RESULTADOS
+
+   7. Votante recibe confirmación
+   6. Sistema registra voto con timestamp
+      └── ✓ Candidato válido
+      ├── ✓ No ha votado antes
+      ├── ✓ Está en horario de votación
+   5. Sistema valida:
+   4. Votante selecciona Candidato B
+   3. Votante ve candidatos del evento
+   2. Votante consulta eventos activos
+   1. Votante hace login → Recibe token
+
+12.2 CASO: VOTANTE EMITE SU VOTO
+
+   4. Sistema activa el proceso
+      └── Candidato C (Independiente)
+      ├── Candidato B (Partido Azul)
+      ├── Candidato A (Partido Rojo)
+   3. Admin crea 3 candidatos:
+      ├── Fechas: 15/12/2024 08:00 - 18:00
+   2. Admin crea evento "Elecciones 2024"
+   1. Admin hace login → Recibe token
+
+12.1 CASO: ADMINISTRADOR CREA PROCESO ELECTORAL
+
+================================================================================
+12. CASOS DE USO COMPLETOS
+================================================================================
+
+   5. Sistema listo para recibir peticiones
+      └── Log: "Usuarios creados exitosamente"
+      │   └── DNI: 11223344, Contraseña: votante123
+      │   ├── DNI: 87654321, Contraseña: votante123
+      ├── Crea usuarios votantes de ejemplo:
+      │   └── DNI: 12345678, Contraseña: admin123
+      ├── Crea usuario administrador por defecto:
+   4. DataInitializer ejecuta:
+   3. Hibernate crea/actualiza tablas automáticamente
+   2. Crea base de datos "votalo_ya" si no existe
+   1. Conecta a MySQL
+
+Al iniciar la aplicación (DataInitializer):
+
+================================================================================
+11. FLUJO DE INICIALIZACIÓN DEL SISTEMA
+================================================================================
+
+      └── Autoriza o deniega acceso
+      ├── Extrae DNI y rol
+      ├── Verifica expiración (24 horas)
+      ├── Verifica firma
+   5. JwtAuthenticationFilter valida el token:
+   4. Cada petición incluye: Authorization: Bearer {token}
+   3. Cliente guarda token (localStorage/sessionStorage)
+   2. Token contiene: DNI, rol, fecha de expiración
+   1. Usuario hace login → Recibe token JWT
+
+10.2 PROCESO DE AUTENTICACIÓN JWT
+
+   └── /api/votar/**          → Solo VOTANTE
+   ├── /api/admin/**          → Solo ADMINISTRADOR
+   Rutas Protegidas por Rol:
+
+   └── /api/publico/**        → Consultas públicas
+   ├── /api/auth/**           → Login y registro
+   Rutas Públicas (Sin autenticación):
+
+10.1 CONFIGURACIÓN DE SEGURIDAD (SecurityConfig)
+
+================================================================================
+10. FLUJO DE SEGURIDAD
+================================================================================
+
+   - Si se elimina un usuario → Se eliminan sus votos
+   - Si se elimina un candidato → Se eliminan sus votos
+   - Si se elimina un evento → Se eliminan sus candidatos y votos
+9.3 CASCADAS
+
+   - Candidato (1) → (N) Votos
+   - Evento (1) → (N) Votos
+   - Evento (1) → (N) Candidatos
+   - Usuario (1) → (N) Votos
+9.2 RELACIONES
+
+   └── UNIQUE(votante_id, evento_id) ← GARANTIZA UN VOTO POR EVENTO
+   ├── fecha_voto
+   ├── evento_id (FK → eventos_votacion.id, CASCADE DELETE)
+   ├── candidato_id (FK → candidatos.id, CASCADE DELETE)
+   ├── votante_id (FK → usuarios.id, CASCADE DELETE)
+   ├── id (PK, AUTO_INCREMENT)
+   votos
+
+   └── evento_id (FK → eventos_votacion.id, CASCADE DELETE)
+   ├── fecha_registro
+   ├── avatar_url
+   ├── partido
+   ├── descripcion
+   ├── nombre
+   ├── id (PK, AUTO_INCREMENT)
+   candidatos
+
+   └── creador_id (FK → usuarios.id)
+   ├── fecha_creacion
+   ├── activo (BOOLEAN)
+   ├── fecha_fin
+   ├── fecha_inicio
+   ├── descripcion
+   ├── nombre
+   ├── id (PK, AUTO_INCREMENT)
+   eventos_votacion
+
+   └── rol (ENUM: ADMINISTRADOR, VOTANTE)
+   ├── numero_telefono
+   ├── correo (UNIQUE)
+   ├── contrasena (ENCRYPTED)
+   ├── dni (UNIQUE)
+   ├── apellidos
+   ├── nombres
+   ├── id (PK, AUTO_INCREMENT)
+   usuarios
+
+9.1 ESTRUCTURA DE TABLAS
+
+================================================================================
+9. FLUJO DE DATOS EN LA BASE DE DATOS
+================================================================================
+
+   └── 4. Retorna archivo para descarga
+   │   └── Total de votos emitidos
+   │   ├── Destacado del ganador
+   │   ├── Tabla de resultados formateada
+   │   ├── Información del evento
+   │   ├── Título del documento
+   ├── 3. ExportService genera PDF con iText:
+   ├── 2. Obtiene resultados del evento
+   ├── 1. Valida permisos de administrador
+   │
+   Admin → GET /api/admin/eventos/{id}/resultados/pdf
+8.2 EXPORTAR A PDF
+
+   └── 4. Retorna archivo para descarga
+   │   └── Filas con datos de cada candidato
+   │   ├── Encabezados: Candidato, Partido, Total Votos, Porcentaje
+   ├── 3. ExportService genera archivo CSV:
+   ├── 2. Obtiene resultados del evento
+   ├── 1. Valida permisos de administrador
+   │
+   Admin → GET /api/admin/eventos/{id}/resultados/csv
+8.1 EXPORTAR A CSV
+
+================================================================================
+8. FLUJO DE EXPORTACIÓN DE RESULTADOS
+================================================================================
+
+   └── 4. Retorna: evento, resultados, ganador, totalVotos
+   ├── 3. Identifica ganador (primer candidato con más votos)
+   ├── 2. Obtiene resultados (mismo cálculo que admin)
+   │   └── Si no → Error: "Resultados disponibles al finalizar"
+   ├── 1. Verifica fecha actual > fechaFin
+   │
+   Cualquiera → GET /api/publico/eventos/{id}/resultados
+7.2 ACCESO PÚBLICO (Solo después del cierre)
+
+   └── 5. Retorna resultados completos
+   │   └── Ordena de mayor a menor
+   │   ├── Porcentaje de cada uno
+   │   ├── Total de votos por candidato
+   ├── 4. Calcula:
+   ├── 3. Agrupa votos por candidato
+   ├── 2. Obtiene todos los votos del evento
+   ├── 1. Valida que sea administrador
+   │
+   Admin → GET /api/admin/eventos/{id}/resultados
+7.1 ACCESO ADMINISTRADOR (En cualquier momento)
+
+================================================================================
+7. FLUJO DE VISUALIZACIÓN DE RESULTADOS
+================================================================================
+
+   - Timestamp automático en cada voto
+   - Validación en código: existsByVotanteIdAndEventoId()
+   - Constraint UNIQUE en BD: (votante_id, evento_id)
+6.2 RESTRICCIONES AUTOMÁTICAS
+
+       └── Retorna: confirmación con datos del voto
+   └── 7. RESPUESTA
+   │
+   │   └── Guarda en BD (COMMIT)
+   │   ├── Asigna fecha/hora automática (@PrePersist)
+   │   ├── Crea registro en tabla votos
+   ├── 6. REGISTRO DEL VOTO
+   │
+   │   └── Si existe → Error: "Ya has votado en este evento"
+   │   ├── Consulta: SELECT * FROM votos WHERE votante_id=X AND evento_id=Y
+   ├── 5. VALIDACIÓN DE VOTO ÚNICO (RQF07)
+   │
+   │   └── Verifica que evento.activo = true
+   │   │   └── Si es después → Error: "Votación ha finalizado"
+   │   ├── Verifica fecha actual vs fechaFin
+   │   │   └── Si es antes → Error: "Votación aún no ha iniciado"
+   │   ├── Verifica fecha actual vs fechaInicio
+   ├── 4. VALIDACIÓN DE FECHAS (RQF05)
+   │
+   │   └── Obtiene el evento del candidato
+   │   ├── Busca candidato por ID
+   ├── 3. VALIDACIÓN DE CANDIDATO
+   │
+   │   └── Si es admin → Error 403
+   │   ├── Verifica que sea VOTANTE (no ADMINISTRADOR)
+   ├── 2. VALIDACIÓN DE ROL
+   │
+   │   └── Busca votante en BD
+   │   ├── Sistema extrae DNI del token JWT
+   ├── 1. AUTENTICACIÓN
+   │
+   Votante → POST /api/votar
+
+6.1 PROCESO COMPLETO DE VOTACIÓN
+
+================================================================================
+6. FLUJO VOTANTE - EMISIÓN DE VOTO
+================================================================================
+
+   └── Retorna: todos los candidatos del evento
+   Admin/Público → GET /api/admin/candidatos/evento/{eventoId}
+5.4 LISTAR CANDIDATOS
+
+   └── Elimina candidato (y sus votos por CASCADE)
+   Admin → DELETE /api/admin/candidatos/{id}
+5.3 ELIMINAR CANDIDATO
+
+   └── Actualiza en BD
+   ├── Modifica datos del candidato
+   Admin → PUT /api/admin/candidatos/{id}
+5.2 EDITAR CANDIDATO
+
+   └── Guarda candidato vinculado al evento
+   ├── Asigna fecha de registro automática
+   ├── Sistema valida que el evento exista
+   ├── Ingresa: nombre, descripción, partido, avatarUrl, eventoId
+   Admin → POST /api/admin/candidatos
+5.1 CREAR CANDIDATO
+
+================================================================================
+5. FLUJO ADMINISTRADOR - GESTIÓN DE CANDIDATOS
+================================================================================
+
+   └── Retorna: todos los eventos (activos e históricos)
+   Admin → GET /api/admin/eventos/todos
+4.4 LISTAR PROCESOS
+
+   ├── Cambia activo=false (mantiene datos históricos)
+   Admin → PATCH /api/admin/eventos/{id}/desactivar
+
+   ├── Elimina completamente el evento y datos relacionados
+   Admin → DELETE /api/admin/eventos/{id}
+4.3 ELIMINAR/DESACTIVAR PROCESO
+
+   └── Actualiza en BD
+   ├── Sistema valida permisos
+   ├── Modifica: nombre, descripción, fechas
+   Admin → PUT /api/admin/eventos/{id}
+4.2 EDITAR PROCESO
+
+   └── Guarda en BD
+   ├── Asigna fecha de creación automática
+   ├── Crea evento con estado activo=true
+   ├── Sistema valida que sea administrador
+   ├── Ingresa: nombre, descripción, fechaInicio, fechaFin
+   Admin → POST /api/admin/eventos
+4.1 CREAR PROCESO DE VOTACIÓN
+
+================================================================================
+4. FLUJO ADMINISTRADOR - GESTIÓN DE EVENTOS
+================================================================================
+
+   └── Permite o deniega acceso
+   ├── Verifica rol del usuario
+   ├── Extrae y valida el token
+   ├── JwtAuthenticationFilter intercepta
+   ├── Cliente envía: Authorization: Bearer {token}
+   Cada petición protegida:
+3.3 VALIDACIÓN DE SESIÓN
+
+   └── Retorna: token, DNI, nombre, correo, rol
+   ├── Sistema genera token JWT (válido 24 horas)
+   ├── Sistema valida credenciales
+   ├── Ingresa: DNI y contraseña
+   Usuario → POST /api/auth/login
+3.2 INICIO DE SESIÓN
+
+   └── Guarda usuario en BD
+   ├── Sistema encripta contraseña con BCrypt
+   ├── Sistema valida: DNI único, correo único
+   ├── Ingresa: nombres, apellidos, DNI, contraseña, email, teléfono, rol
+   Usuario → POST /api/auth/registro
+3.1 REGISTRO DE USUARIO
+
+================================================================================
+3. FLUJO DE AUTENTICACIÓN
+================================================================================
+
+   - Ve resultados finalizados
+   - Ve candidatos
+   - Ve eventos activos
+2.3 PÚBLICO (Sin autenticación)
+
+   - Ve resultados públicos (después del cierre)
+   - Emite un voto por proceso electoral
+   - Inicia sesión
+   - Se registra en el sistema
+2.2 VOTANTE
+
+   - Exporta resultados a CSV/PDF
+   - Ve resultados en cualquier momento
+   - Crea, edita y elimina candidatos
+   - Gestiona procesos de votación
+2.1 ADMINISTRADOR
+
+================================================================================
+2. ACTORES DEL SISTEMA
+================================================================================
+
+└── Entities (Modelo de datos)
+├── Repositories (Acceso a datos)
+├── Services (Lógica de negocio)
+├── Controllers (API REST)
+Capas del sistema:
+
+- Patrón: MVC (Model-View-Controller)
+- Base de datos: MySQL
+- Seguridad: Spring Security + JWT
+- Backend: Spring Boot 3.x con Java 17
+El sistema está construido con:
+
+================================================================================
+1. ARQUITECTURA GENERAL
+================================================================================
+
+================================================================================
+                    Sistema de Votaciones Online
+                    FLUJO DEL SISTEMA - VOTALO YA
+
